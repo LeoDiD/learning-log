@@ -1,0 +1,26 @@
+name: Daily Log Commit
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Every day at midnight
+  workflow_dispatch:
+
+jobs:
+  commit-daily-log:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up date
+        id: date
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Create log entry
+        run: |
+          echo "Daily log for $DATE" >> logs/log-$DATE.md
+          git config --global user.name "Leovi Garcia"
+          git config --global user.email "you@example.com"
+          git add .
+          git commit -m "📝 Daily log entry for $DATE" || echo "No changes to commit"
+          git push
