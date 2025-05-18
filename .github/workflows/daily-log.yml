@@ -16,6 +16,9 @@ jobs:
         id: date
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
+      - name: Ensure logs directory exists
+        run: mkdir -p logs
+
       - name: Create log entry
         run: |
           echo "Daily log for $DATE" >> logs/log-$DATE.md
