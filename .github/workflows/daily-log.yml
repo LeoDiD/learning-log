@@ -2,7 +2,7 @@ name: Daily Log Commit
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Every day at midnight
+    - cron: '0 0 * * *'  # Every day at midnight UTC
   workflow_dispatch:
 
 permissions:
@@ -22,16 +22,21 @@ jobs:
       - name: Ensure logs directory exists
         run: mkdir -p logs
 
-      - name: Create log entry
+      - name: Create log entry with template
         run: |
-          echo "Daily log for $DATE" >> logs/log-$DATE.md
+          FILE="logs/log-${DATE}.md"
+          if [ ! -f "$FILE" ]; then
+            echo "# 🧠 Learning Log - ${DATE}" > $FILE
+            echo -e "\n## ✅ What I learned\n\n- " >> $FILE
+            echo -e "\n## 📚 Resources used\n\n- " >> $FILE
+            echo -e "\n## ❓ Questions I have\n\n- " >> $FILE
+          fi
           git config --global user.name "Leovi Garcia"
           git config --global user.email "you@example.com"
-          git add .
-          git commit -m "📝 Daily log entry for $DATE" || echo "No changes to commit"
-      
+          git add logs/
+          git commit -m "📝 Daily log entry for ${DATE}" || echo "No changes to commit"
+
       - name: Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git push
+        run: git push
